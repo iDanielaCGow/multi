@@ -1,449 +1,256 @@
 <html>
 <head>
-
+  <!-- // Adapta el ancho de la página a la pantalla del celular. -->
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
+  <!-- // A-Frame permite crear la escena y mostrar modelos 3D. -->
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+  <!-- // MindAR reconoce las imágenes y coloca los modelos sobre ellas. -->
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-
-
-
+  
   <style>
-
+  <!--  // Estilo general, margen, desplazamiento, letra Arial -->
     body {
       margin: 0;
       overflow: hidden;
       font-family: Arial, sans-serif;
     }
-
-
+  <!--  // Aviso fijo arriba, centrado, con fondo oscuro y por encima de la escena -->
     #mensaje {
       position: fixed;
-
       top: 25px;
       left: 50%;
       transform: translateX(-50%);
-
       width: 80%;
       max-width: 400px;
-
       padding: 14px 20px;
-
       background: rgba(0, 0, 0, 0.65);
       color: white;
-
       border-radius: 15px;
-
       text-align: center;
       font-size: 16px;
-
       z-index: 1000;
-
       transition: all 0.3s ease;
     }
-
-
-
+  <!--  // El aviso se vuelve verde al detectar una imagen -->
     #mensaje.detectado {
       background: rgba(40, 120, 70, 0.85);
     }
-
-
-
-
+  <!--  // Marco centrado, no bloquea los toques -->
     #guia {
       position: fixed;
-
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-
       width: 65vw;
       max-width: 320px;
-
       aspect-ratio: 1 / 1;
-
       border: 3px solid white;
       border-radius: 20px;
-
       z-index: 999;
-
       pointer-events: none;
-
       transition: opacity 0.3s ease;
     }
-
-
-
+  <!--  // Segundo marco punteado dentro de la guía -->
     #guia::before {
       content: "";
-
       position: absolute;
-
       top: 50%;
       left: 50%;
-
       width: 85%;
       height: 85%;
-
       transform: translate(-50%, -50%);
-
       border: 1px dashed rgba(255, 255, 255, 0.7);
-
       border-radius: 15px;
     }
-
-
-
+  <!--  // Oculta la guía cuando reconoce una imagen -->
     #guia.oculto {
       opacity: 0;
     }
-
-
   </style>
-
-
-
+  
   <script>
-
+    // espera a que el HTML esté listo para buscar sus elementos
     document.addEventListener("DOMContentLoaded", function () {
-
-
-
+      // prepara un modelo para alternar su tamaño y girar al tocarlo.
       function hacerInteractivo(id, escalaNormal, escalaGrande) {
-
+        // busca el modelo por su identificador #
         const modelo = document.querySelector(id);
-
+        // guarda si el modelo está ampliado, comienza en tamaño normal
         let grande = false;
-
-
+		
+        // ejecuta esta función cuando se hace clic en el modelo
         modelo.addEventListener("click", function () {
-
-
+		
+          // ignora nuevos toques mientras termina el giro anterior
           if (modelo.getAttribute("data-animando") === "true") {
             return;
           }
-
-
+          // marca el modelo como ocupado durante la animación
+          // gira 360° sobre el eje Y en 1s
           modelo.setAttribute("data-animando", "true");
-
-
-
+          // si está pequeño, lo amplía. Si ya está grande, recupera su tamaño normal
           if (!grande) {
-
+            // gira 360° sobre el eje Y en 1s
             modelo.setAttribute("scale", escalaGrande);
-
             grande = true;
-
-          } else {
-
+          } 
+		  
+		  else {
+            // gira 360° sobre el eje Y en 1s
             modelo.setAttribute("scale", escalaNormal);
-
             grande = false;
-
           }
-
-
-
+		  
+          // elimina la animación de giro SI existe
           modelo.removeAttribute("animation__giro");
-
-
+          // gira 360° sobre el eje Y en 1s
           modelo.setAttribute(
-
             "animation__giro",
-
             "property: rotation; from: 0 0 0; to: 0 360 0; dur: 1000; easing: easeInOutQuad"
-
           );
-
-
+		  
+          // después de un segundo limpia el giro, restablece la orientación y permite otro clic
           setTimeout(function () {
-
+            // elimina la animación de giro si existe
             modelo.removeAttribute("animation__giro");
-
+            // gira 360° sobre el eje Y en 1s
             modelo.setAttribute("rotation", "0 0 0");
-
+            // gira 360° sobre el eje Y en 1s
             modelo.setAttribute("data-animando", "false");
-
           }, 1000);
-
-
         });
-
       }
-
-
-      hacerInteractivo(
-        "#link",
-        "0.020715 0.020715 0.020715",
-        "0.03 0.03 0.03"
-      );
-
-
-      hacerInteractivo(
-        "#zora",
-        "0.020715 0.020715 0.020715",
-        "0.03 0.03 0.03"
-      );
-
-
-      hacerInteractivo(
-        "#goron",
-        "0.020715 0.020715 0.020715",
-        "0.03 0.03 0.03"
-      );
-
-
-      hacerInteractivo(
-        "#deku",
-        "0.020715 0.020715 0.020715",
-        "0.03 0.03 0.03"
-      );
-
-
-
-
-
+	  
+      // activa la interacción, identificador #, escala normal y escala grande en X, Y y Z
+	  // Link
+      hacerInteractivo("#link", "0.020715 0.020715 0.020715", "0.03 0.03 0.03");
+      // Zora
+      hacerInteractivo("#zora", "0.020715 0.020715 0.020715", "0.03 0.03 0.03");
+      // Goron
+      hacerInteractivo("#goron", "0.020715 0.020715 0.020715", "0.03 0.03 0.03");
+      // Deku
+      hacerInteractivo("#deku", "0.020715 0.020715 0.020715", "0.03 0.03 0.03");
+	  
+      // busca el aviso y el marco guía para actualizarlos al detectar o perder imágenes
       const mensaje = document.querySelector("#mensaje");
-
       const guia = document.querySelector("#guia");
-
-
-      //Cuando encuentra target
-
+	  
+      // cuando MindAR encuentra una imagen, muestra el nombre del personaje
       function targetEncontrado(nombre) {
-
+        // cambia el texto del aviso
+		//<br> crea un salto de línea
         mensaje.innerHTML =
           "¡" + nombre + " detectado!<br>Toca al personaje para interactuar";
-
+        // activa el estilo verde del aviso
         mensaje.classList.add("detectado");
-
+        // esconde el marco guía
         guia.classList.add("oculto");
-
       }
-
-
-      //Cuando perdemos un target
-
+      // cuando MindAR pierde una imagen, restaura el aviso inicial
       function targetPerdido() {
-
+        // cambia el texto del aviso
         mensaje.innerHTML =
           "🔍 Apunta la cámara hacia una de las imágenes";
-
+        // recupera el fondo oscuro del aviso
         mensaje.classList.remove("detectado");
-
+        // vuelve a mostrar el marco guía
         guia.classList.remove("oculto");
-
       }
-
-
-      const targetLink =
-        document.querySelector("#target-link");
-
-
-      targetLink.addEventListener(
-        "targetFound",
-        function () {
-
-          targetEncontrado("Link");
-
-        }
-      );
-
-
-      targetLink.addEventListener(
-        "targetLost",
-        function () {
-
-          targetPerdido();
-
-        }
-      );
-
-
-      const targetZora =
-        document.querySelector("#target-zora");
-
-
-      targetZora.addEventListener(
-        "targetFound",
-        function () {
-
-          targetEncontrado("Zora");
-
-        }
-      );
-
-
-      targetZora.addEventListener(
-        "targetLost",
-        function () {
-
-          targetPerdido();
-
-        }
-      );
-
-
-      const targetGoron =
-        document.querySelector("#target-goron");
-
-
-      targetGoron.addEventListener(
-        "targetFound",
-        function () {
-
-          targetEncontrado("Goron");
-
-        }
-      );
-
-
-      targetGoron.addEventListener(
-        "targetLost",
-        function () {
-
-          targetPerdido();
-
-        }
-      );
-
-
-      const targetDeku =
-        document.querySelector("#target-deku");
-
-
-      targetDeku.addEventListener(
-        "targetFound",
-        function () {
-
-          targetEncontrado("Deku");
-
-        }
-      );
-
-
-      targetDeku.addEventListener(
-        "targetLost",
-        function () {
-
-          targetPerdido();
-
-        }
-      );
-
-
+      // busca el contenedor de la imagen, targetFound - detectada y targetLost - perdida
+      const targetLink = document.querySelector("#target-link");
+      targetLink.addEventListener("targetFound", function () {
+        targetEncontrado("Link");
+      });
+      targetLink.addEventListener("targetLost", function () {
+        targetPerdido();
+      });
+      const targetZora = document.querySelector("#target-zora");
+      targetZora.addEventListener("targetFound", function () {
+        targetEncontrado("Zora");
+      });
+      targetZora.addEventListener("targetLost", function () {
+        targetPerdido();
+      });
+      const targetGoron = document.querySelector("#target-goron");
+      targetGoron.addEventListener("targetFound", function () {
+        targetEncontrado("Goron");
+      });
+      targetGoron.addEventListener("targetLost", function () {
+        targetPerdido();
+      });
+      const targetDeku = document.querySelector("#target-deku");
+      targetDeku.addEventListener("targetFound", function () {
+        targetEncontrado("Deku");
+      });
+      targetDeku.addEventListener("targetLost", function () {
+        targetPerdido();
+      });
     });
-
   </script>
-
 </head>
-
-
+<!-- // Elementos visibles y escena de realidad aumentada. -->
 <body>
-
-
+  <!-- // texto inicial -->
   <div id="mensaje">
-
     🔍 Apunta la cámara hacia una de las imágenes
-
   </div>
-
-
+  <!-- // Marco -->
   <div id="guia"></div>
-
-
+  
+  <!-- // Escena AR - markerc.mind contiene las imágenes, maxTrack define cuántos son -->
+  <!-- // uiScanning - no desactiva la guía de escaneo de MindAR -->
+  <!-- // color-space y renderer configuran el color/renderizado, las últimas opciones ocultan interfaces de VR y orientación -->
   <a-scene
-
     mindar-image="
       imageTargetSrc: ./markerc.mind;
       maxTrack: 4;
       uiScanning: no;
     "
-
     color-space="sRGB"
-
     renderer="
       colorManagement: true,
       physicallyCorrectLights
     "
-
     vr-mode-ui="enabled: false"
-
     device-orientation-permission-ui="enabled: false">
-
-
+	
+    <!-- // Archivos 3D - cada id permite reutilizar su modelo mediante src="#...". -->
     <a-assets>
-
-
-      <a-asset-item
-        id="LinkModel"
-        src="./Link.glb">
-      </a-asset-item>
-
-
-      <a-asset-item
-        id="ZoraModel"
-        src="./Zora.glb">
-      </a-asset-item>
-
-
-      <a-asset-item
-        id="GoronModel"
-        src="./Goron.glb">
-      </a-asset-item>
-
-
-      <a-asset-item
-        id="DekuModel"
-        src="./Deku.glb">
-      </a-asset-item>
-
-
+      <a-asset-item id="LinkModel" src="./Link.glb"></a-asset-item>
+      <a-asset-item id="ZoraModel" src="./Zora.glb"></a-asset-item>
+      <a-asset-item id="GoronModel" src="./Goron.glb"></a-asset-item>
+      <a-asset-item id="DekuModel" src="./Deku.glb"></a-asset-item>
     </a-assets>
-
-
-
+	
+    <!-- // cámara en el origen. look-controls desactivado deja el seguimiento a MindAR -->
+    <!-- // el cursor recibe clics sin activación por espera, raycaster solo selecciona objetos .clickable. -->
     <a-camera
-
       position="0 0 0"
-
       look-controls="enabled: false"
-
       cursor="
         fuse: false;
         rayOrigin: mouse;
       "
-
       raycaster="
         objects: .clickable
       ">
-
     </a-camera>
-
-
-
+	
+    <!-- // Contenedor asociado a una imagen - targetIndex es su posición dentro de markerc.mind, empezando en 0 -->
+	<!-- // LINK -->
     <a-entity
-
       id="target-link"
-
       mindar-image-target="targetIndex: 0">
-
-
+      <!-- // id lo identifica el modelo, clickable permite tocarlo y src selecciona el archivo precargado -->
+      <!-- // position lo coloca en X/Y/Z, rotation indica grados y scale ajusta su tamaño en cada eje -->
+      <!-- // flotar anima su posición durante 1s, repitiendo la ida y vuelta -->
       <a-gltf-model
-
         id="link"
-
         class="clickable"
-
         src="#LinkModel"
-
         position="0 0 0.1"
-
         rotation="0 0 0"
-
         scale="0.020715 0.020715 0.020715"
-
         animation__flotar="
           property: position;
           to: 0 0.1 0.1;
@@ -451,35 +258,21 @@
           easing: easeInOutQuad;
           loop: true;
           dir: alternate">
-
       </a-gltf-model>
-
-
     </a-entity>
-
-
-
+	
+    <!-- // ZORA -->
     <a-entity
-
       id="target-zora"
-
       mindar-image-target="targetIndex: 1">
-
-
-      <a-gltf-model
-
+	  
+       <a-gltf-model
         id="zora"
-
         class="clickable"
-
         src="#ZoraModel"
-
         position="0 0 0.1"
-
         rotation="0 0 0"
-
         scale="0.020715 0.020715 0.020715"
-
         animation__flotar="
           property: position;
           to: 0 0.1 0.1;
@@ -487,35 +280,21 @@
           easing: easeInOutQuad;
           loop: true;
           dir: alternate">
-
       </a-gltf-model>
-
-
     </a-entity>
 
-
-
+    <!-- // GORON -->
     <a-entity
-
       id="target-goron"
-
       mindar-image-target="targetIndex: 2">
 
-
       <a-gltf-model
-
         id="goron"
-
         class="clickable"
-
         src="#GoronModel"
-
         position="0 0 0.1"
-
         rotation="0 0 0"
-
         scale="0.020715 0.020715 0.020715"
-
         animation__flotar="
           property: position;
           to: 0 0.1 0.1;
@@ -523,37 +302,21 @@
           easing: easeInOutQuad;
           loop: true;
           dir: alternate">
-
       </a-gltf-model>
-
-
     </a-entity>
 
-
-
-
-
+    <!-- // DEKU -->
     <a-entity
-
       id="target-deku"
-
       mindar-image-target="targetIndex: 3">
-
-
+ 
       <a-gltf-model
-
         id="deku"
-
         class="clickable"
-
         src="#DekuModel"
-
         position="0 0 0.1"
-
         rotation="0 0 0"
-
         scale="0.020715 0.020715 0.020715"
-
         animation__flotar="
           property: position;
           to: 0 0.1 0.1;
@@ -561,16 +324,8 @@
           easing: easeInOutQuad;
           loop: true;
           dir: alternate">
-
       </a-gltf-model>
-
-
     </a-entity>
-
-
   </a-scene>
-
-
 </body>
-</html>
 </html>
