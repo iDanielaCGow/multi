@@ -1,246 +1,576 @@
 <html>
-  <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+<head>
 
-    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
-        // Función para hacer interactivo cada modelo
-        function hacerInteractivo(id, escalaNormal, escalaGrande) {
 
-          const modelo = document.querySelector(id);
-          let grande = false;
 
-          modelo.addEventListener("click", function () {
+  <style>
 
-            // Evita iniciar otra animación mientras está girando
-            if (modelo.getAttribute("data-animando") === "true") {
-              return;
-            }
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
 
-            modelo.setAttribute("data-animando", "true");
 
-            // Cambiar tamaño
-            if (!grande) {
-              modelo.setAttribute("scale", escalaGrande);
-              grande = true;
-            } else {
-              modelo.setAttribute("scale", escalaNormal);
-              grande = false;
-            }
+    #mensaje {
+      position: fixed;
 
-            // Eliminar una animación anterior
+      top: 25px;
+      left: 50%;
+      transform: translateX(-50%);
+
+      width: 80%;
+      max-width: 400px;
+
+      padding: 14px 20px;
+
+      background: rgba(0, 0, 0, 0.65);
+      color: white;
+
+      border-radius: 15px;
+
+      text-align: center;
+      font-size: 16px;
+
+      z-index: 1000;
+
+      transition: all 0.3s ease;
+    }
+
+
+
+    #mensaje.detectado {
+      background: rgba(40, 120, 70, 0.85);
+    }
+
+
+
+
+    #guia {
+      position: fixed;
+
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+
+      width: 65vw;
+      max-width: 320px;
+
+      aspect-ratio: 1 / 1;
+
+      border: 3px solid white;
+      border-radius: 20px;
+
+      z-index: 999;
+
+      pointer-events: none;
+
+      transition: opacity 0.3s ease;
+    }
+
+
+
+    #guia::before {
+      content: "";
+
+      position: absolute;
+
+      top: 50%;
+      left: 50%;
+
+      width: 85%;
+      height: 85%;
+
+      transform: translate(-50%, -50%);
+
+      border: 1px dashed rgba(255, 255, 255, 0.7);
+
+      border-radius: 15px;
+    }
+
+
+
+    #guia.oculto {
+      opacity: 0;
+    }
+
+
+  </style>
+
+
+
+  <script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+
+
+      function hacerInteractivo(id, escalaNormal, escalaGrande) {
+
+        const modelo = document.querySelector(id);
+
+        let grande = false;
+
+
+        modelo.addEventListener("click", function () {
+
+
+          if (modelo.getAttribute("data-animando") === "true") {
+            return;
+          }
+
+
+          modelo.setAttribute("data-animando", "true");
+
+
+
+          if (!grande) {
+
+            modelo.setAttribute("scale", escalaGrande);
+
+            grande = true;
+
+          } else {
+
+            modelo.setAttribute("scale", escalaNormal);
+
+            grande = false;
+
+          }
+
+
+
+          modelo.removeAttribute("animation__giro");
+
+
+          modelo.setAttribute(
+
+            "animation__giro",
+
+            "property: rotation; from: 0 0 0; to: 0 360 0; dur: 1000; easing: easeInOutQuad"
+
+          );
+
+
+          setTimeout(function () {
+
             modelo.removeAttribute("animation__giro");
 
-            // Hacer una vuelta completa
-            modelo.setAttribute(
-              "animation__giro",
-              "property: rotation; from: 0 0 0; to: 0 360 0; dur: 1000; easing: easeInOutQuad"
-            );
+            modelo.setAttribute("rotation", "0 0 0");
 
-            // Después del giro permitimos otro toque
-            setTimeout(function () {
-              modelo.removeAttribute("animation__giro");
-              modelo.setAttribute("rotation", "0 0 0");
-              modelo.setAttribute("data-animando", "false");
-            }, 1000);
+            modelo.setAttribute("data-animando", "false");
 
-          });
+          }, 1000);
+
+
+        });
+
+      }
+
+
+      hacerInteractivo(
+        "#link",
+        "0.020715 0.020715 0.020715",
+        "0.03 0.03 0.03"
+      );
+
+
+      hacerInteractivo(
+        "#zora",
+        "0.020715 0.020715 0.020715",
+        "0.03 0.03 0.03"
+      );
+
+
+      hacerInteractivo(
+        "#goron",
+        "0.020715 0.020715 0.020715",
+        "0.03 0.03 0.03"
+      );
+
+
+      hacerInteractivo(
+        "#deku",
+        "0.020715 0.020715 0.020715",
+        "0.03 0.03 0.03"
+      );
+
+
+
+
+
+      const mensaje = document.querySelector("#mensaje");
+
+      const guia = document.querySelector("#guia");
+
+
+      //Cuando encuentra target
+
+      function targetEncontrado(nombre) {
+
+        mensaje.innerHTML =
+          "✨ ¡" + nombre + " detectado!<br>Toca al personaje para interactuar";
+
+        mensaje.classList.add("detectado");
+
+        guia.classList.add("oculto");
+
+      }
+
+
+      //Cuando perdemos un target
+
+      function targetPerdido() {
+
+        mensaje.innerHTML =
+          "🔍 Apunta la cámara hacia una de las imágenes";
+
+        mensaje.classList.remove("detectado");
+
+        guia.classList.remove("oculto");
+
+      }
+
+
+      const targetLink =
+        document.querySelector("#target-link");
+
+
+      targetLink.addEventListener(
+        "targetFound",
+        function () {
+
+          targetEncontrado("Link");
+
         }
+      );
 
 
-        // INTERACCIONES DE CADA PERSONAJE
+      targetLink.addEventListener(
+        "targetLost",
+        function () {
 
-        hacerInteractivo(
-          "#link",
-          "0.020715 0.020715 0.020715",
-          "0.03 0.03 0.03"
-        );
+          targetPerdido();
 
-        hacerInteractivo(
-          "#zora",
-          "0.020715 0.020715 0.020715",
-          "0.03 0.03 0.03"
-        );
-
-        hacerInteractivo(
-          "#goron",
-          "0.020715 0.020715 0.020715",
-          "0.03 0.03 0.03"
-        );
-
-        hacerInteractivo(
-          "#deku",
-          "0.020715 0.020715 0.020715",
-          "0.03 0.03 0.03"
-        );
-
-      });
-    </script>
-  </head>
+        }
+      );
 
 
-  <body>
-
-    <a-scene
-      mindar-image="imageTargetSrc: ./markerc.mind; maxTrack: 4"
-      color-space="sRGB"
-      renderer="colorManagement: true, physicallyCorrectLights"
-      vr-mode-ui="enabled: false"
-      device-orientation-permission-ui="enabled: false">
+      const targetZora =
+        document.querySelector("#target-zora");
 
 
-      <!-- MODELOS -->
-      <a-assets>
+      targetZora.addEventListener(
+        "targetFound",
+        function () {
 
-        <a-asset-item
-          id="LinkModel"
-          src="./Link.glb">
-        </a-asset-item>
+          targetEncontrado("Zora");
 
-        <a-asset-item
-          id="ZoraModel"
-          src="./Zora.glb">
-        </a-asset-item>
-
-        <a-asset-item
-          id="GoronModel"
-          src="./Goron.glb">
-        </a-asset-item>
-
-        <a-asset-item
-          id="DekuModel"
-          src="./Deku.glb">
-        </a-asset-item>
-
-      </a-assets>
+        }
+      );
 
 
-      <!-- CÁMARA -->
-      <a-camera
-        position="0 0 0"
-        look-controls="enabled: false"
-        cursor="fuse: false; rayOrigin: mouse;"
-        raycaster="objects: .clickable">
-      </a-camera>
+      targetZora.addEventListener(
+        "targetLost",
+        function () {
+
+          targetPerdido();
+
+        }
+      );
 
 
-      <!-- ==================== -->
-      <!-- TARGET 0 - LINK -->
-      <!-- ==================== -->
-
-      <a-entity
-        id="target-link"
-        mindar-image-target="targetIndex: 0">
-
-        <a-gltf-model
-          id="link"
-          class="clickable"
-          src="#LinkModel"
-          position="0 0 0.1"
-          rotation="0 0 0"
-          scale="0.020715 0.020715 0.020715"
-
-          animation__flotar="
-            property: position;
-            to: 0 0.1 0.1;
-            dur: 1000;
-            easing: easeInOutQuad;
-            loop: true;
-            dir: alternate">
-        </a-gltf-model>
-
-      </a-entity>
+      const targetGoron =
+        document.querySelector("#target-goron");
 
 
-      <!-- ==================== -->
-      <!-- TARGET 1 - ZORA -->
-      <!-- ==================== -->
+      targetGoron.addEventListener(
+        "targetFound",
+        function () {
 
-      <a-entity
-        id="target-zora"
-        mindar-image-target="targetIndex: 1">
+          targetEncontrado("Goron");
 
-        <a-gltf-model
-          id="zora"
-          class="clickable"
-          src="#ZoraModel"
-          position="0 0 0.1"
-          rotation="0 0 0"
-          scale="0.020715 0.020715 0.020715"
-
-          animation__flotar="
-            property: position;
-            to: 0 0.1 0.1;
-            dur: 1000;
-            easing: easeInOutQuad;
-            loop: true;
-            dir: alternate">
-        </a-gltf-model>
-
-      </a-entity>
+        }
+      );
 
 
-      <!-- ==================== -->
-      <!-- TARGET 2 - GORON -->
-      <!-- ==================== -->
+      targetGoron.addEventListener(
+        "targetLost",
+        function () {
 
-      <a-entity
-        id="target-goron"
-        mindar-image-target="targetIndex: 2">
+          targetPerdido();
 
-        <a-gltf-model
-          id="goron"
-          class="clickable"
-          src="#GoronModel"
-          position="0 0 0.1"
-          rotation="0 0 0"
-          scale="0.020715 0.020715 0.020715"
-
-          animation__flotar="
-            property: position;
-            to: 0 0.1 0.1;
-            dur: 1000;
-            easing: easeInOutQuad;
-            loop: true;
-            dir: alternate">
-        </a-gltf-model>
-
-      </a-entity>
+        }
+      );
 
 
-      <!-- ==================== -->
-      <!-- TARGET 3 - DEKU -->
-      <!-- ==================== -->
-
-      <a-entity
-        id="target-deku"
-        mindar-image-target="targetIndex: 3">
-
-        <a-gltf-model
-          id="deku"
-          class="clickable"
-          src="#DekuModel"
-          position="0 0 0.1"
-          rotation="0 0 0"
-          scale="0.020715 0.020715 0.020715"
-
-          animation__flotar="
-            property: position;
-            to: 0 0.1 0.1;
-            dur: 1000;
-            easing: easeInOutQuad;
-            loop: true;
-            dir: alternate">
-        </a-gltf-model>
-
-      </a-entity>
+      const targetDeku =
+        document.querySelector("#target-deku");
 
 
-    </a-scene>
+      targetDeku.addEventListener(
+        "targetFound",
+        function () {
 
-  </body>
+          targetEncontrado("Deku");
+
+        }
+      );
+
+
+      targetDeku.addEventListener(
+        "targetLost",
+        function () {
+
+          targetPerdido();
+
+        }
+      );
+
+
+    });
+
+  </script>
+
+</head>
+
+
+<body>
+
+
+  <div id="mensaje">
+
+    🔍 Apunta la cámara hacia una de las imágenes
+
+  </div>
+
+
+  <div id="guia"></div>
+
+
+  <a-scene
+
+    mindar-image="
+      imageTargetSrc: ./markerc.mind;
+      maxTrack: 4;
+      uiScanning: no;
+    "
+
+    color-space="sRGB"
+
+    renderer="
+      colorManagement: true,
+      physicallyCorrectLights
+    "
+
+    vr-mode-ui="enabled: false"
+
+    device-orientation-permission-ui="enabled: false">
+
+
+    <a-assets>
+
+
+      <a-asset-item
+        id="LinkModel"
+        src="./Link.glb">
+      </a-asset-item>
+
+
+      <a-asset-item
+        id="ZoraModel"
+        src="./Zora.glb">
+      </a-asset-item>
+
+
+      <a-asset-item
+        id="GoronModel"
+        src="./Goron.glb">
+      </a-asset-item>
+
+
+      <a-asset-item
+        id="DekuModel"
+        src="./Deku.glb">
+      </a-asset-item>
+
+
+    </a-assets>
+
+
+
+    <a-camera
+
+      position="0 0 0"
+
+      look-controls="enabled: false"
+
+      cursor="
+        fuse: false;
+        rayOrigin: mouse;
+      "
+
+      raycaster="
+        objects: .clickable
+      ">
+
+    </a-camera>
+
+
+
+    <a-entity
+
+      id="target-link"
+
+      mindar-image-target="targetIndex: 0">
+
+
+      <a-gltf-model
+
+        id="link"
+
+        class="clickable"
+
+        src="#LinkModel"
+
+        position="0 0 0.1"
+
+        rotation="0 0 0"
+
+        scale="0.020715 0.020715 0.020715"
+
+        animation__flotar="
+          property: position;
+          to: 0 0.1 0.1;
+          dur: 1000;
+          easing: easeInOutQuad;
+          loop: true;
+          dir: alternate">
+
+      </a-gltf-model>
+
+
+    </a-entity>
+
+
+
+    <a-entity
+
+      id="target-zora"
+
+      mindar-image-target="targetIndex: 1">
+
+
+      <a-gltf-model
+
+        id="zora"
+
+        class="clickable"
+
+        src="#ZoraModel"
+
+        position="0 0 0.1"
+
+        rotation="0 0 0"
+
+        scale="0.020715 0.020715 0.020715"
+
+        animation__flotar="
+          property: position;
+          to: 0 0.1 0.1;
+          dur: 1000;
+          easing: easeInOutQuad;
+          loop: true;
+          dir: alternate">
+
+      </a-gltf-model>
+
+
+    </a-entity>
+
+
+
+    <a-entity
+
+      id="target-goron"
+
+      mindar-image-target="targetIndex: 2">
+
+
+      <a-gltf-model
+
+        id="goron"
+
+        class="clickable"
+
+        src="#GoronModel"
+
+        position="0 0 0.1"
+
+        rotation="0 0 0"
+
+        scale="0.020715 0.020715 0.020715"
+
+        animation__flotar="
+          property: position;
+          to: 0 0.1 0.1;
+          dur: 1000;
+          easing: easeInOutQuad;
+          loop: true;
+          dir: alternate">
+
+      </a-gltf-model>
+
+
+    </a-entity>
+
+
+
+
+
+    <a-entity
+
+      id="target-deku"
+
+      mindar-image-target="targetIndex: 3">
+
+
+      <a-gltf-model
+
+        id="deku"
+
+        class="clickable"
+
+        src="#DekuModel"
+
+        position="0 0 0.1"
+
+        rotation="0 0 0"
+
+        scale="0.020715 0.020715 0.020715"
+
+        animation__flotar="
+          property: position;
+          to: 0 0.1 0.1;
+          dur: 1000;
+          easing: easeInOutQuad;
+          loop: true;
+          dir: alternate">
+
+      </a-gltf-model>
+
+
+    </a-entity>
+
+
+  </a-scene>
+
+
+</body>
+</html>
 </html>
