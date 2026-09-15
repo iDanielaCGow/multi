@@ -8,13 +8,13 @@
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
   
   <style>
-  <!--  // Estilo general, margen, desplazamiento, letra Arial -->
+  /* Estilo general, margen, desplazamiento, letra Arial */
     body {
       margin: 0;
       overflow: hidden;
       font-family: Arial, sans-serif;
     }
-  <!--  // Aviso fijo arriba, centrado, con fondo oscuro y por encima de la escena -->
+  /* Aviso fijo arriba, centrado, con fondo oscuro y por encima de la escena */
     #mensaje {
       position: fixed;
       top: 25px;
@@ -31,11 +31,11 @@
       z-index: 1000;
       transition: all 0.3s ease;
     }
-  <!--  // El aviso se vuelve verde al detectar una imagen -->
+  /* El aviso se vuelve verde al detectar una imagen */
     #mensaje.detectado {
       background: rgba(40, 120, 70, 0.85);
     }
-  <!--  // Marco centrado, no bloquea los toques -->
+  /* Marco centrado, no bloquea los toques */
     #guia {
       position: fixed;
       top: 50%;
@@ -50,7 +50,7 @@
       pointer-events: none;
       transition: opacity 0.3s ease;
     }
-  <!--  // Segundo marco punteado dentro de la guía -->
+  /* Segundo marco punteado dentro de la guía */
     #guia::before {
       content: "";
       position: absolute;
@@ -62,7 +62,7 @@
       border: 1px dashed rgba(255, 255, 255, 0.7);
       border-radius: 15px;
     }
-  <!--  // Oculta la guía cuando reconoce una imagen -->
+  /* Oculta la guía cuando reconoce una imagen */
     #guia.oculto {
       opacity: 0;
     }
