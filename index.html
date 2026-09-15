@@ -4,7 +4,84 @@
 
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+
+        // Función para hacer interactivo cada modelo
+        function hacerInteractivo(id, escalaNormal, escalaGrande) {
+
+          const modelo = document.querySelector(id);
+          let grande = false;
+
+          modelo.addEventListener("click", function () {
+
+            // Evita iniciar otra animación mientras está girando
+            if (modelo.getAttribute("data-animando") === "true") {
+              return;
+            }
+
+            modelo.setAttribute("data-animando", "true");
+
+            // Cambiar tamaño
+            if (!grande) {
+              modelo.setAttribute("scale", escalaGrande);
+              grande = true;
+            } else {
+              modelo.setAttribute("scale", escalaNormal);
+              grande = false;
+            }
+
+            // Eliminar una animación anterior
+            modelo.removeAttribute("animation__giro");
+
+            // Hacer una vuelta completa
+            modelo.setAttribute(
+              "animation__giro",
+              "property: rotation; from: 0 0 0; to: 0 360 0; dur: 1000; easing: easeInOutQuad"
+            );
+
+            // Después del giro permitimos otro toque
+            setTimeout(function () {
+              modelo.removeAttribute("animation__giro");
+              modelo.setAttribute("rotation", "0 0 0");
+              modelo.setAttribute("data-animando", "false");
+            }, 1000);
+
+          });
+        }
+
+
+        // INTERACCIONES DE CADA PERSONAJE
+
+        hacerInteractivo(
+          "#link",
+          "0.020715 0.020715 0.020715",
+          "0.03 0.03 0.03"
+        );
+
+        hacerInteractivo(
+          "#zora",
+          "0.020715 0.020715 0.020715",
+          "0.03 0.03 0.03"
+        );
+
+        hacerInteractivo(
+          "#goron",
+          "0.020715 0.020715 0.020715",
+          "0.03 0.03 0.03"
+        );
+
+        hacerInteractivo(
+          "#deku",
+          "0.020715 0.020715 0.020715",
+          "0.03 0.03 0.03"
+        );
+
+      });
+    </script>
   </head>
+
 
   <body>
 
@@ -15,6 +92,8 @@
       vr-mode-ui="enabled: false"
       device-orientation-permission-ui="enabled: false">
 
+
+      <!-- MODELOS -->
       <a-assets>
 
         <a-asset-item
@@ -39,62 +118,127 @@
 
       </a-assets>
 
+
+      <!-- CÁMARA -->
       <a-camera
         position="0 0 0"
-        look-controls="enabled: false">
+        look-controls="enabled: false"
+        cursor="fuse: false; rayOrigin: mouse;"
+        raycaster="objects: .clickable">
       </a-camera>
 
 
-      <a-entity mindar-image-target="targetIndex: 0">
+      <!-- ==================== -->
+      <!-- TARGET 0 - LINK -->
+      <!-- ==================== -->
+
+      <a-entity
+        id="target-link"
+        mindar-image-target="targetIndex: 0">
 
         <a-gltf-model
+          id="link"
+          class="clickable"
           src="#LinkModel"
           position="0 0 0.1"
           rotation="0 0 0"
           scale="0.020715 0.020715 0.020715"
-          animation="property: position; to: 0 0.1 0.1; dur: 1000; easing: easeInOutQuad; loop: true; dir: alternate">
+
+          animation__flotar="
+            property: position;
+            to: 0 0.1 0.1;
+            dur: 1000;
+            easing: easeInOutQuad;
+            loop: true;
+            dir: alternate">
         </a-gltf-model>
 
       </a-entity>
 
 
-      <a-entity mindar-image-target="targetIndex: 1">
+      <!-- ==================== -->
+      <!-- TARGET 1 - ZORA -->
+      <!-- ==================== -->
+
+      <a-entity
+        id="target-zora"
+        mindar-image-target="targetIndex: 1">
 
         <a-gltf-model
+          id="zora"
+          class="clickable"
           src="#ZoraModel"
           position="0 0 0.1"
           rotation="0 0 0"
           scale="0.020715 0.020715 0.020715"
-          animation="property: position; to: 0 0.1 0.1; dur: 1000; easing: easeInOutQuad; loop: true; dir: alternate">
+
+          animation__flotar="
+            property: position;
+            to: 0 0.1 0.1;
+            dur: 1000;
+            easing: easeInOutQuad;
+            loop: true;
+            dir: alternate">
         </a-gltf-model>
 
       </a-entity>
 
 
-      <a-entity mindar-image-target="targetIndex: 2">
+      <!-- ==================== -->
+      <!-- TARGET 2 - GORON -->
+      <!-- ==================== -->
+
+      <a-entity
+        id="target-goron"
+        mindar-image-target="targetIndex: 2">
 
         <a-gltf-model
+          id="goron"
+          class="clickable"
           src="#GoronModel"
           position="0 0 0.1"
           rotation="0 0 0"
           scale="0.020715 0.020715 0.020715"
-          animation="property: position; to: 0 0.1 0.1; dur: 1000; easing: easeInOutQuad; loop: true; dir: alternate">
+
+          animation__flotar="
+            property: position;
+            to: 0 0.1 0.1;
+            dur: 1000;
+            easing: easeInOutQuad;
+            loop: true;
+            dir: alternate">
         </a-gltf-model>
 
       </a-entity>
 
 
-      <a-entity mindar-image-target="targetIndex: 3">
+      <!-- ==================== -->
+      <!-- TARGET 3 - DEKU -->
+      <!-- ==================== -->
+
+      <a-entity
+        id="target-deku"
+        mindar-image-target="targetIndex: 3">
 
         <a-gltf-model
+          id="deku"
+          class="clickable"
           src="#DekuModel"
           position="0 0 0.1"
           rotation="0 0 0"
           scale="0.020715 0.020715 0.020715"
-          animation="property: position; to: 0 0.1 0.1; dur: 1000; easing: easeInOutQuad; loop: true; dir: alternate">
+
+          animation__flotar="
+            property: position;
+            to: 0 0.1 0.1;
+            dur: 1000;
+            easing: easeInOutQuad;
+            loop: true;
+            dir: alternate">
         </a-gltf-model>
 
       </a-entity>
+
 
     </a-scene>
 
